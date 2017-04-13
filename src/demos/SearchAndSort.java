@@ -64,6 +64,13 @@ public class SearchAndSort {
 		}
 		return null;
 	}
+	public static String finsAirportCodeMy(String toFind, ArrayList<Airport> airports){
+		for (int i=0; i<airports.size(); i++){
+			if(toFind.equals(airports.get(i)))
+				return airports.get(i).getCode3();
+		}
+		return null;
+	}
 	
 	// Binary search for the airport code
 	// toFind is a city name
