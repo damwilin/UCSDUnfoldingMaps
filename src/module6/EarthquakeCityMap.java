@@ -2,6 +2,7 @@ package module6;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -36,10 +37,10 @@ public class EarthquakeCityMap extends PApplet {
 	private static final long serialVersionUID = 1L;
 
 	// IF YOU ARE WORKING OFFILINE, change the value of this variable to true
-	private static final boolean offline = false;
+	private static final boolean offline = true;
 	
 	/** This is where to find the local tiles, for working without an Internet connection */
-	public static String mbTilesString = "blankLight-1-3.mbtiles";
+	public static String mbTilesString = "D:\\GOOGLE\\PROGRAMOWANIE\\Coursera\\UCSDUnfoldingMaps\\data\\blankLight-1-3.mbtiles";
 	
 	
 
@@ -47,8 +48,8 @@ public class EarthquakeCityMap extends PApplet {
 	private String earthquakesURL = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.atom";
 	
 	// The files containing city names and info and country names and info
-	private String cityFile = "city-data.json";
-	private String countryFile = "countries.geo.json";
+	private String cityFile = "D:\\GOOGLE\\PROGRAMOWANIE\\Coursera\\UCSDUnfoldingMaps\\data\\city-data.json";
+	private String countryFile = "D:\\GOOGLE\\PROGRAMOWANIE\\Coursera\\UCSDUnfoldingMaps\\data\\countries.geo.json";
 	
 	// The map
 	private UnfoldingMap map;
@@ -64,13 +65,15 @@ public class EarthquakeCityMap extends PApplet {
 	// NEW IN MODULE 5
 	private CommonMarker lastSelected;
 	private CommonMarker lastClicked;
+	private boolean hiddenCities = false;
+	private boolean hiddenInLand = false;
 	
 	public void setup() {		
 		// (1) Initializing canvas and map tiles
 		size(900, 700, OPENGL);
 		if (offline) {
 		    map = new UnfoldingMap(this, 200, 50, 650, 600, new MBTilesMapProvider(mbTilesString));
-		    earthquakesURL = "2.5_week.atom";  // The same feed, but saved August 7, 2015
+		    earthquakesURL = "D:\\GOOGLE\\PROGRAMOWANIE\\Coursera\\UCSDUnfoldingMaps\\data\\2.5_week.atom";  // The same feed, but saved August 7, 2015
 		}
 		else {
 			map = new UnfoldingMap(this, 200, 50, 650, 600, new Google.GoogleMapProvider());
@@ -82,7 +85,7 @@ public class EarthquakeCityMap extends PApplet {
 		// FOR TESTING: Set earthquakesURL to be one of the testing files by uncommenting
 		// one of the lines below.  This will work whether you are online or offline
 		//earthquakesURL = "test1.atom";
-		//earthquakesURL = "test2.atom";
+		earthquakesURL = "D:\\GOOGLE\\PROGRAMOWANIE\\Coursera\\UCSDUnfoldingMaps\\data\\quiz2.atom";
 		
 		// Uncomment this line to take the quiz
 		//earthquakesURL = "quiz2.atom";
@@ -123,7 +126,8 @@ public class EarthquakeCityMap extends PApplet {
 	    //           for their geometric properties
 	    map.addMarkers(quakeMarkers);
 	    map.addMarkers(cityMarkers);
-	    
+
+		sortAndPrint(20);
 	    
 	}  // End setup
 	
@@ -135,7 +139,56 @@ public class EarthquakeCityMap extends PApplet {
 		
 	}
 	
-	
+	@Override
+	public void keyPressed() {
+		if (key == 'c') {
+			if (hiddenCities == false) {
+				hideCities();
+				hiddenCities = true;
+			} else if (hiddenCities == true) {
+				unhideCities();
+				hiddenCities = false;
+			}
+		}
+		else if (key == 'l'){
+			if (hiddenInLand == false){
+				hideInLand();
+				hiddenInLand = true;
+			}
+			else if (hiddenInLand ==true){
+				unhideInLand();
+				hiddenInLand = false;
+			}
+
+		}
+	}
+	private void hideInLand(){
+		for (Marker marker : quakeMarkers){
+			if (marker instanceof LandQuakeMarker){
+				marker.setHidden(true);
+			}
+		}
+	}
+	private void unhideInLand(){
+		for (Marker marker: quakeMarkers){
+			if (marker instanceof LandQuakeMarker){
+				marker.setHidden(false);
+			}
+		}
+	}
+
+	private void hideCities(){
+		for (Marker marker : cityMarkers){
+			marker.setHidden(true);
+		}
+	}
+	private void unhideCities(){
+		for (Marker marker: cityMarkers){
+			marker.setHidden(false);
+		}
+	}
+
+
 	// TODO: Add the method:
 	//   private void sortAndPrint(int numToPrint)
 	// and then call that method from setUp
@@ -408,6 +461,18 @@ public class EarthquakeCityMap extends PApplet {
 			return true;
 		}
 		return false;
+	}
+
+	private void sortAndPrint(int numToPrint){
+		List<EarthquakeMarker> quakeToSortMarkers = new ArrayList<EarthquakeMarker>();
+		for (Marker marker: quakeMarkers){
+			quakeToSortMarkers.add((EarthquakeMarker)marker);
+		}
+		Collections.sort(quakeToSortMarkers);
+		if (numToPrint > quakeToSortMarkers.size())
+			numToPrint = quakeToSortMarkers.size();
+		for (int i=0; i<numToPrint; i++)
+			System.out.println(quakeToSortMarkers.get(i));
 	}
 
 }
